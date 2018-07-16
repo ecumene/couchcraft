@@ -75,6 +75,12 @@ public abstract class ControllerContext {
     public void guiOpened(GuiOpenEvent event){
         targets.clearTargets();
         targets.setTargetDB(event.gui);
+        try {
+            targets.searchTargets();
+            targets.chooseFirst();
+        } catch (IllegalAccessException e){
+            e.printStackTrace();
+        }
     }
 
     @SideOnly(Side.CLIENT)

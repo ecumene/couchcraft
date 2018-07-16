@@ -22,9 +22,9 @@ public class XboxControllerGameInput extends ControllerGameInput {
         this.attack = new ThresholdXAxisBinding(0.45f, controllerContext.triggers);
         this.build = new ThresholdYAxisBinding(0.45f, controllerContext.triggers);
 
-        this.mouseUp = new ThresholdYAxisBinding(false,-0.45f, controllerContext.leftThumb);
+        this.mouseUp = new ThresholdYAxisBinding(true,-0.45f, controllerContext.leftThumb);
         this.mouseDown = new ThresholdYAxisBinding(0.45f, controllerContext.leftThumb);
-        this.mouseLeft = new ThresholdXAxisBinding(false, -0.45f, controllerContext.leftThumb);
+        this.mouseLeft = new ThresholdXAxisBinding(true, -0.45f, controllerContext.leftThumb);
         this.mouseRight = new ThresholdXAxisBinding(0.45f, controllerContext.leftThumb);
 
         this.sneakBinding = controllerContext.stickDownLeft;
