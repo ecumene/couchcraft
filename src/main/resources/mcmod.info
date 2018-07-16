@@ -1,0 +1,16 @@
+[
+{
+  "modid": "couchcraft",
+  "name": "Couchcraft",
+  "description": "Partial Controller Support for Minecraft",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["www.ecumene.xyz"],
+  "credits": "JXInput, JInput",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
