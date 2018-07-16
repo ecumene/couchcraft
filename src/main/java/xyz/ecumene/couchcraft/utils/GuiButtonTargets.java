@@ -10,6 +10,7 @@ import javax.vecmath.Vector2f;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class GuiButtonTargets {
     public List<Vector2f> targets;
     public GuiScreen targetDB;
@@ -19,89 +20,147 @@ public class GuiButtonTargets {
     public boolean moveLeft, moveRight, moveDown, moveUp;
     public Vector2f target;
 
+    public boolean newGuiFlag;
+
     public void tick() {
         if(Minecraft.getMinecraft().currentScreen != null) { // Accessing buttons that aren't on screen doesn't make sense, go away ;)
-            Vector2f currentTarget = getCurrentTarget();
+            if(newGuiFlag) {
+                chooseFirst();
+                newGuiFlag = false;
+            }
 
             //TODO: Multipress?
-            //TODO: Not judging distance based on center in all cases, but instead button size as well
-            if (moveRight) {
-                Vector2f closest = new Vector2f(-1, -1);
-                for (Vector2f screenTarget : targets) {
-                    if (screenTarget.x > currentTarget.x) {
-                        Vector2f distance1 = new Vector2f(screenTarget);
-                        distance1.sub(getCurrentTarget());
-                        Vector2f distance2 = new Vector2f(closest);
-                        distance2.sub(getCurrentTarget());
-
-                        if (distance1.length() < distance2.length()) {
-                            closest = screenTarget;
-                        }
-                    }
-                }
-                if (!closest.equals(new Vector2f(-1, -1)))
-                    this.target = closest;
-            }
-            if (moveLeft) {
-                Vector2f closest = new Vector2f(-1, -1);
-                for (Vector2f screenTarget : targets) {
-                    if (screenTarget.x < currentTarget.x) {
-                        Vector2f distance1 = new Vector2f(screenTarget);
-                        distance1.sub(getCurrentTarget());
-                        Vector2f distance2 = new Vector2f(closest);
-                        distance2.sub(getCurrentTarget());
-
-                        if (distance1.length() < distance2.length()) {
-                            closest = screenTarget;
-                        }
-                    }
-                }
-                if (!closest.equals(new Vector2f(-1, -1)))
-                    this.target = closest;
-            }
-            if (moveUp) {
-                Vector2f closest = new Vector2f(-1, -1);
-                for (Vector2f screenTarget : targets) {
-                    if (screenTarget.y < currentTarget.y) {
-                        Vector2f distance1 = new Vector2f(screenTarget);
-                        distance1.sub(getCurrentTarget());
-                        Vector2f distance2 = new Vector2f(closest);
-                        distance2.sub(getCurrentTarget());
-
-                        if (distance1.length() < distance2.length()) {
-                            closest = screenTarget;
-                        }
-                    }
-                }
-                if (!closest.equals(new Vector2f(-1, -1)))
-                    this.target = closest;
-            }
-            if (moveDown) {
-                Vector2f closest = new Vector2f(-1, -1);
-                for (Vector2f screenTarget : targets) {
-                    if (screenTarget.y > currentTarget.y) {
-                        Vector2f distance1 = new Vector2f(screenTarget);
-                        distance1.sub(getCurrentTarget());
-                        Vector2f distance2 = new Vector2f(closest);
-                        distance2.sub(getCurrentTarget());
-
-                        if (distance1.length() < distance2.length()) {
-                            closest = screenTarget;
-                        }
-                    }
-                }
-                if (!closest.equals(new Vector2f(-1, -1)))
-                    this.target = closest;
-            }
+            if (moveRight) moveRight();
+            if (moveLeft) moveLeft();
+            if (moveUp) moveUp();
+            if (moveDown) moveDown();
 
             if (Mouse.getX() == 0 && Mouse.getY() == 0)
                 chooseFirst();
         }
     }
 
+    public void moveUp(){
+        Vector2f currentTarget = getCurrentMouse();
+        Vector2f closest = new Vector2f(-1, -1);
+        for (Vector2f screenTarget : targets)
+            if (screenTarget.y < currentTarget.y)
+                closest = closer(currentTarget, screenTarget, closest);
+        if (!closest.equals(new Vector2f(-1, -1)))
+            this.target = closest;
+        else lowerMost();
+    }
+
+    public void moveDown(){
+        Vector2f currentTarget = getCurrentMouse();
+        Vector2f closest = new Vector2f(-1, -1);
+        for (Vector2f screenTarget : targets)
+            if (screenTarget.y > currentTarget.y)
+                closest = closer(currentTarget, screenTarget, closest);
+        if (!closest.equals(new Vector2f(-1, -1)))
+            this.target = closest;
+        else upperMost();
+    }
+
+    public void moveRight(){
+        Vector2f currentTarget = getCurrentMouse();
+        Vector2f toTheRight = new Vector2f(-1, -1);
+        boolean moved = false;
+        for (Vector2f screenTarget : targets)
+            if (screenTarget.y == currentTarget.y && screenTarget.x > currentTarget.x)
+                toTheRight = closer(currentTarget, screenTarget, toTheRight);
+        if (!toTheRight.equals(new Vector2f(-1, -1))) {
+            this.target = toTheRight;
+            moved = true;
+        }
+        else {
+            Vector2f closest = new Vector2f(-1, -1);
+            for (Vector2f screenTarget : targets)
+                if (screenTarget.x > currentTarget.x)
+                    closest = closer(currentTarget, screenTarget, closest);
+            if (!closest.equals(new Vector2f(-1, -1))) {
+                this.target = closest;
+                moved = true;
+            }
+        }
+        if(!moved) leftMost();
+    }
+
+    public void moveLeft(){
+        Vector2f currentTarget = getCurrentMouse();
+        Vector2f toTheLeft = new Vector2f(-1, -1);
+        boolean moved = false;
+        for (Vector2f screenTarget : targets)
+            if (screenTarget.y == currentTarget.y && screenTarget.x < currentTarget.x)
+                toTheLeft = closer(currentTarget, screenTarget, toTheLeft);
+        if (!toTheLeft.equals(new Vector2f(-1, -1))) {
+            this.target = toTheLeft;
+            moved = true;
+        }
+        else {
+            Vector2f closest = new Vector2f(-1, -1);
+            for (Vector2f screenTarget : targets)
+                if (screenTarget.x < currentTarget.x)
+                    closest = closer(currentTarget, screenTarget, closest);
+            if (!closest.equals(new Vector2f(-1, -1))) {
+                this.target = closest;
+                moved = true;
+            }
+        }
+        if(!moved) rightMost();
+    }
+
+    public void leftMost(){
+        Vector2f currentTarget = getCurrentMouse();
+        Vector2f toTheLeft = target;
+        for (Vector2f screenTarget : targets)
+            if (screenTarget.y == currentTarget.y && screenTarget.x < toTheLeft.x)
+                toTheLeft = screenTarget;
+        if (!toTheLeft.equals(target))
+            this.target = toTheLeft;
+    }
+
+    public void rightMost(){
+        Vector2f currentTarget = getCurrentMouse();
+        Vector2f toTheRight = target;
+        for (Vector2f screenTarget : targets)
+            if (screenTarget.y == currentTarget.y && screenTarget.x > toTheRight.x)
+                toTheRight = screenTarget;
+        if (!toTheRight.equals(target))
+            this.target = toTheRight;
+    }
+
+    public void upperMost(){
+        Vector2f highest = target;
+        for (Vector2f screenTarget : targets)
+            if (screenTarget.y < highest.y)
+                highest = screenTarget;
+        if (!highest.equals(target))
+            this.target = highest;
+    }
+
+    public void lowerMost(){
+        Vector2f lowest = target;
+        for (Vector2f screenTarget : targets)
+            if (screenTarget.y > lowest.y)
+                lowest = screenTarget;
+        if (!lowest.equals(target))
+            this.target = lowest;
+    }
+
+    public Vector2f closer(Vector2f currentPosition, Vector2f t1, Vector2f t2){
+        Vector2f distance1 = new Vector2f(t1);
+        distance1.sub(currentPosition);
+        Vector2f distance2 = new Vector2f(t2);
+        distance2.sub(currentPosition);
+
+        if (distance1.length() < distance2.length()) return t1;
+        else return t2;
+    }
+
     private static Vector2f mouseCoords = new Vector2f();
 
-    public static Vector2f getCurrentTarget() {
+    public static Vector2f getCurrentMouse() {
         mouseCoords.set(ControllerContext.targetMouseX, ControllerContext.targetMouseY);
         return mouseCoords;
     }
@@ -116,6 +175,7 @@ public class GuiButtonTargets {
 
     public void setTargetDB(GuiScreen screen) {
         this.targetDB = screen;
+        newGuiFlag = true;
      }
 
     public void chooseFirst(){

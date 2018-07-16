@@ -60,10 +60,22 @@ public class ControllerGameInput extends GameInput {
         if(mouseLeft != null) mouseLeft.onTick();
 
         if(ControllerContext.controllerGUIInteractMode){
-            if(mouseUp != null) controllerContext.targets.moveUp = mouseUp.justPressed;
-            if(mouseDown != null) controllerContext.targets.moveDown = mouseDown.justPressed;
-            if(mouseRight != null) controllerContext.targets.moveLeft = mouseLeft.justPressed;
-            if(mouseLeft != null) controllerContext.targets.moveRight = mouseRight.justPressed;
+            if(mouseUp != null) {
+                controllerContext.targets.moveUp = mouseUp.justPressed;
+                if(mouseUp.ticksDown > 13) controllerContext.targets.moveUp = mouseUp.ticksDown % 5 == 0;
+            }
+            if(mouseDown != null) {
+                controllerContext.targets.moveDown = mouseDown.justPressed;
+                if(mouseDown.ticksDown > 13) controllerContext.targets.moveDown = mouseDown.ticksDown % 5 == 0;
+            }
+            if(mouseRight != null) {
+                controllerContext.targets.moveRight = mouseRight.justPressed;
+                if(mouseRight.ticksDown > 13) controllerContext.targets.moveRight = mouseRight.ticksDown % 5 == 0;
+            }
+            if(mouseLeft != null) {
+                controllerContext.targets.moveLeft = mouseLeft.justPressed;
+                if(mouseLeft.ticksDown > 13) controllerContext.targets.moveLeft = mouseLeft.ticksDown % 5 == 0;
+            }
         }
 
         if(exitGUIBinding.pressed)

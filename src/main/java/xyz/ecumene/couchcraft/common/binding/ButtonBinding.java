@@ -6,6 +6,7 @@ public class ButtonBinding {
     public boolean pressed, lastPressed;
     public boolean justPressed, justRelease;
     public int pressTime;
+    public int ticksDown;
 
     public void onPoll(){
         justPressed = false;
@@ -19,5 +20,7 @@ public class ButtonBinding {
 
     public void onTick(){
         if(justPressed) pressTime++;
+        if(pressed) ticksDown++;
+        else ticksDown = 0;
     }
 }
