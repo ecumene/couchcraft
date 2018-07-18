@@ -24,12 +24,6 @@ import javax.vecmath.Vector2f;
  */
 public abstract class ControllerContext {
 
-    public static boolean controllerGUIInteractMode = true;
-    private static boolean lastControllerMode = false;
-    public int animationState;
-
-    public GuiButtonTargets targets;
-
     public AxisBinding rightThumb, leftThumb, triggers;
 
     public ButtonBinding button1, button2, button3, button4;
@@ -37,9 +31,6 @@ public abstract class ControllerContext {
     public ButtonBinding stickDownLeft, stickDownRight;
     public ButtonBinding povUp, povDown, povLeft, povRight;
     public ButtonBinding bumperLeft, bumperRight;
-
-    //TODO: Fix this?
-    public static int targetMouseX, targetMouseY;
 
     public ControllerContext(){
         rightThumb = new AxisBinding();
@@ -64,31 +55,6 @@ public abstract class ControllerContext {
 
         bumperLeft = new ButtonBinding();
         bumperRight = new ButtonBinding();
-
-        targets = new GuiButtonTargets();
-
-        MinecraftForge.EVENT_BUS.register(this);
-    }
-
-    @SideOnly(Side.CLIENT)
-    @SubscribeEvent
-    public void guiOpened(GuiOpenEvent event){
-        targets.clearTargets();
-        targets.setTargetDB(event.gui);
-    }
-
-    @SideOnly(Side.CLIENT)
-    @SubscribeEvent
-    public void renderCursorOnGui(GuiScreenEvent.DrawScreenEvent.Post post){
-        if(targets != null) {
-            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-            Minecraft.getMinecraft().renderEngine.bindTexture(CouchcraftMod.guiIcons);
-            if (animationState >= 0) {
-                int animationX = animationState % 16;
-                int animationY = (int) Math.floor((double) animationState / 16.0D);
-                post.gui.drawTexturedModalRect(targetMouseX, targetMouseY, animationX * 16, animationY * 16, 16, 16);
-            }
-        }
     }
 
     /**
@@ -98,34 +64,6 @@ public abstract class ControllerContext {
     public void poll(Controller controller) {
         controller.poll();
         pollInputs(controller);
-
-        // TODO: Move most of this to ControllerGameInput, it belongs there...
-        // Leave only poll related things
-
-        if(Mouse.getDX()>0.15f | Mouse.getDY()>0.15f | Mouse.getDWheel()>0.1f)
-            controllerGUIInteractMode = false;
-
-        if(Minecraft.getMinecraft().currentScreen != null) {
-            if(controllerGUIInteractMode){
-                animationState = 1;
-                Mouse.setGrabbed(true);
-                ScaledResolution scaledresolution = new ScaledResolution(Minecraft.getMinecraft(), Minecraft.getMinecraft().displayWidth, Minecraft.getMinecraft().displayHeight);
-                Mouse.setCursorPosition(targetMouseX*scaledresolution.getScaleFactor(), Minecraft.getMinecraft().displayHeight-targetMouseY*scaledresolution.getScaleFactor());
-                if(button1.justPressed) ControllerGameUtils.mouseClick(0, Minecraft.getMinecraft().currentScreen, targetMouseX, targetMouseY);
-                if(button1.pressed) animationState = 2;
-                if(button1.justRelease) ControllerGameUtils.mouseMovedOrUp(Minecraft.getMinecraft().currentScreen, targetMouseX, targetMouseY);
-            } else animationState = -1;
-
-            try {
-                targets.searchTargets();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-            targets.tick();
-            Vector2f target = targets.getNextTarget();
-            targetMouseX = (int) target.x;
-            targetMouseY = (int) target.y;
-        }
 
         //TODO: Check if already done this once per tick
         button1.onPoll();
@@ -142,11 +80,6 @@ public abstract class ControllerContext {
         povRight.onPoll();
         bumperLeft.onPoll();
         bumperRight.onPoll();
-
-        if(controllerGUIInteractMode != lastControllerMode && !controllerGUIInteractMode)
-                Mouse.setGrabbed(false);
-
-        lastControllerMode = controllerGUIInteractMode;
     }
 
     public void tickInputs(){
