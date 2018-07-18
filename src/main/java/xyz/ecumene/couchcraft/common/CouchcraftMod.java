@@ -11,6 +11,7 @@ import net.java.games.input.ControllerEnvironment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.MovementInputFromOptions;
 import net.minecraft.util.ResourceLocation;
+import xyz.ecumene.couchcraft.common.binding.ButtonBinding;
 import xyz.ecumene.couchcraft.controller.xbox.XboxContext;
 import xyz.ecumene.couchcraft.controller.xbox.XboxControllerGameInput;
 
@@ -55,7 +56,7 @@ public class CouchcraftMod {
     public void onClientTick(TickEvent.ClientTickEvent event) {
         if(event.type == TickEvent.Type.CLIENT)
             performControllerPollAndActions();
-    }
+        }
 
     private void performControllerPollAndActions(){
         if(controller != null) {

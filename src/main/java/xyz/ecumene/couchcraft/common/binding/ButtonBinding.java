@@ -1,8 +1,11 @@
 package xyz.ecumene.couchcraft.common.binding;
 
 import xyz.ecumene.couchcraft.common.ControllerContext;
+import xyz.ecumene.couchcraft.utils.ControllerCursor;
 
 public class ButtonBinding {
+    public static boolean universalButtonPressOnThisTick;
+
     public boolean pressed, lastPressed;
     public boolean justPressed, justRelease;
     public int pressTime;
@@ -15,7 +18,7 @@ public class ButtonBinding {
         if(!pressed && lastPressed) justRelease = true;
         lastPressed = pressed;
 
-        if(justPressed) ControllerContext.controllerGUIInteractMode = true;
+        if(justPressed) ControllerCursor.controllerGUIInteractMode = true;
     }
 
     public void onTick(){

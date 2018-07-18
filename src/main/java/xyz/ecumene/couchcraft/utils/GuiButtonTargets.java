@@ -22,6 +22,8 @@ public class GuiButtonTargets {
 
     public boolean newGuiFlag;
 
+    public static int targetX, targetY;
+
     public void tick() {
         if(Minecraft.getMinecraft().currentScreen != null) { // Accessing buttons that aren't on screen doesn't make sense, go away ;)
             if(newGuiFlag) {
@@ -160,8 +162,9 @@ public class GuiButtonTargets {
 
     private static Vector2f mouseCoords = new Vector2f();
 
+    /**TODO: Determine current target somehow else?*/
     public static Vector2f getCurrentMouse() {
-        mouseCoords.set(ControllerContext.targetMouseX, ControllerContext.targetMouseY);
+        mouseCoords.set(targetX, targetY);
         return mouseCoords;
     }
 

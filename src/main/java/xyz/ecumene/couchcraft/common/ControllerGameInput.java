@@ -16,7 +16,6 @@ public class ControllerGameInput extends GameInput {
     public ButtonBinding inventoryGUIBinding, exitGUIBinding;
     public ButtonBinding attack, build;
 
-    public ButtonBinding mouseUp, mouseDown, mouseRight, mouseLeft;
 
     public ButtonBinding hotbarRight, hotbarLeft;
 
@@ -48,35 +47,6 @@ public class ControllerGameInput extends GameInput {
         if(attack!=null)attack.onTick();
         if(build!=null)build.onTick();
         if(sneakBinding !=null) sneakBinding.onTick();
-
-        if(mouseUp != null) mouseUp.onPoll();
-        if(mouseDown != null) mouseDown.onPoll();
-        if(mouseRight != null) mouseRight.onPoll();
-        if(mouseLeft != null) mouseLeft.onPoll();
-
-        if(mouseUp != null) mouseUp.onTick();
-        if(mouseDown != null) mouseDown.onTick();
-        if(mouseRight != null) mouseRight.onTick();
-        if(mouseLeft != null) mouseLeft.onTick();
-
-        if(ControllerContext.controllerGUIInteractMode){
-            if(mouseUp != null) {
-                controllerContext.targets.moveUp = mouseUp.justPressed;
-                if(mouseUp.ticksDown > 13) controllerContext.targets.moveUp = mouseUp.ticksDown % 5 == 0;
-            }
-            if(mouseDown != null) {
-                controllerContext.targets.moveDown = mouseDown.justPressed;
-                if(mouseDown.ticksDown > 13) controllerContext.targets.moveDown = mouseDown.ticksDown % 5 == 0;
-            }
-            if(mouseRight != null) {
-                controllerContext.targets.moveRight = mouseRight.justPressed;
-                if(mouseRight.ticksDown > 13) controllerContext.targets.moveRight = mouseRight.ticksDown % 5 == 0;
-            }
-            if(mouseLeft != null) {
-                controllerContext.targets.moveLeft = mouseLeft.justPressed;
-                if(mouseLeft.ticksDown > 13) controllerContext.targets.moveLeft = mouseLeft.ticksDown % 5 == 0;
-            }
-        }
 
         if(exitGUIBinding.pressed)
             escapeGUI();
