@@ -20,9 +20,10 @@ public class ControllerCursor {
 
     public GuiButtonTargets targets;
 
+    public AxisBinding hoverAxis;
     public int targetMouseX, targetMouseY;
 
-    public boolean mouseDetatchPossible = true, enableMouseInteraction = true;
+    public boolean mouseDetatchPossible = true, enableMouseInteraction = true, hoverMode = true;
 
     public ControllerCursor(){
         targets = new GuiButtonTargets();
@@ -56,19 +57,24 @@ public class ControllerCursor {
             }
             targets.tick();
 
-            if(targets.button instanceof GuiSlider){
-                Vector2f target = targets.getNextTarget();
-                targetMouseX = (int) target.x;
-                targetMouseY = (int) target.y;
+            if(hoverMode) {
+                if(targets.button instanceof GuiSlider){
+                    Vector2f target = targets.getNextTarget();
+                    targetMouseX = (int) target.x;
+                    targetMouseY = (int) target.y;
 
-                //TODO: Fix sliders
+                    //TODO: Fix sliders
 
-                GuiSlider slider = (GuiSlider) targets.button;
-                targetMouseX += (slider.sliderValue-0.5f) * slider.width;
+                    GuiSlider slider = (GuiSlider) targets.button;
+                    targetMouseX += (slider.sliderValue-0.5f) * slider.width;
+                } else {
+                    Vector2f target = targets.getNextTarget();
+                    targetMouseX = (int) target.x;
+                    targetMouseY = (int) target.y;
+                }
             } else {
-                Vector2f target = targets.getNextTarget();
-                targetMouseX = (int) target.x;
-                targetMouseY = (int) target.y;
+                targetMouseX = (int) hoverAxis.x;
+                targetMouseY = (int) hoverAxis.y;
             }
         }
 
