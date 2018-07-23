@@ -1,6 +1,8 @@
 package xyz.ecumene.couchcraft.utils;
 
+import cpw.mods.fml.client.config.GuiSlider;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import org.lwjgl.input.Mouse;
@@ -53,9 +55,21 @@ public class ControllerCursor {
                 e.printStackTrace();
             }
             targets.tick();
-            Vector2f target = targets.getNextTarget();
-            targetMouseX = (int) target.x;
-            targetMouseY = (int) target.y;
+
+            if(targets.button instanceof GuiSlider){
+                Vector2f target = targets.getNextTarget();
+                targetMouseX = (int) target.x;
+                targetMouseY = (int) target.y;
+
+                //TODO: Fix sliders
+
+                GuiSlider slider = (GuiSlider) targets.button;
+                targetMouseX += (slider.sliderValue-0.5f) * slider.width;
+            } else {
+                Vector2f target = targets.getNextTarget();
+                targetMouseX = (int) target.x;
+                targetMouseY = (int) target.y;
+            }
         }
 
         if(controllerGUIInteractMode != lastControllerMode && !controllerGUIInteractMode)
