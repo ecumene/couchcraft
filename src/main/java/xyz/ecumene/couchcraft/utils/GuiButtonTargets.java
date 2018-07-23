@@ -7,22 +7,23 @@ import org.lwjgl.input.Mouse;
 import xyz.ecumene.couchcraft.common.ControllerContext;
 
 import javax.vecmath.Vector2f;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
 public class GuiButtonTargets {
-    public List<Vector2f> targets;
+    public Map<Vector2f, GuiButton> targets;
     public GuiScreen targetDB;
 
     static FieldHelper<GuiScreen, List> fieldButtonList = new FieldHelper<>(GuiScreen.class, "field_146292_n", "buttonList");
 
-    public boolean moveLeft, moveRight, moveDown, moveUp;
-    public Vector2f target;
-
     public boolean newGuiFlag;
+    public boolean moveLeft, moveRight, moveDown, moveUp;
+
+    public Vector2f target;
+    public GuiButton button;
 
     public static int targetX, targetY;
+    public GuiButton currentTarget;
 
     public void tick() {
         if(Minecraft.getMinecraft().currentScreen != null) { // Accessing buttons that aren't on screen doesn't make sense, go away ;)
@@ -45,22 +46,26 @@ public class GuiButtonTargets {
     public void moveUp(){
         Vector2f currentTarget = getCurrentMouse();
         Vector2f closest = new Vector2f(-1, -1);
-        for (Vector2f screenTarget : targets)
+        for (Vector2f screenTarget : targets.keySet())
             if (screenTarget.y < currentTarget.y)
                 closest = closer(currentTarget, screenTarget, closest);
-        if (!closest.equals(new Vector2f(-1, -1)))
+        if (!closest.equals(new Vector2f(-1, -1))) {
             this.target = closest;
+            this.button = targets.get(target);
+        }
         else lowerMost();
     }
 
     public void moveDown(){
         Vector2f currentTarget = getCurrentMouse();
         Vector2f closest = new Vector2f(-1, -1);
-        for (Vector2f screenTarget : targets)
+        for (Vector2f screenTarget : targets.keySet())
             if (screenTarget.y > currentTarget.y)
                 closest = closer(currentTarget, screenTarget, closest);
-        if (!closest.equals(new Vector2f(-1, -1)))
+        if (!closest.equals(new Vector2f(-1, -1))) {
             this.target = closest;
+            this.button = targets.get(target);//TODO: Itr via hashmap itr for reduced lookups
+        }
         else upperMost();
     }
 
@@ -68,20 +73,22 @@ public class GuiButtonTargets {
         Vector2f currentTarget = getCurrentMouse();
         Vector2f toTheRight = new Vector2f(-1, -1);
         boolean moved = false;
-        for (Vector2f screenTarget : targets)
+        for (Vector2f screenTarget : targets.keySet())
             if (screenTarget.y == currentTarget.y && screenTarget.x > currentTarget.x)
                 toTheRight = closer(currentTarget, screenTarget, toTheRight);
         if (!toTheRight.equals(new Vector2f(-1, -1))) {
             this.target = toTheRight;
+            this.button = targets.get(target);
             moved = true;
         }
         else {
             Vector2f closest = new Vector2f(-1, -1);
-            for (Vector2f screenTarget : targets)
+            for (Vector2f screenTarget : targets.keySet())
                 if (screenTarget.x > currentTarget.x)
                     closest = closer(currentTarget, screenTarget, closest);
             if (!closest.equals(new Vector2f(-1, -1))) {
                 this.target = closest;
+                this.button = targets.get(target);
                 moved = true;
             }
         }
@@ -92,20 +99,22 @@ public class GuiButtonTargets {
         Vector2f currentTarget = getCurrentMouse();
         Vector2f toTheLeft = new Vector2f(-1, -1);
         boolean moved = false;
-        for (Vector2f screenTarget : targets)
+        for (Vector2f screenTarget : targets.keySet())
             if (screenTarget.y == currentTarget.y && screenTarget.x < currentTarget.x)
                 toTheLeft = closer(currentTarget, screenTarget, toTheLeft);
         if (!toTheLeft.equals(new Vector2f(-1, -1))) {
             this.target = toTheLeft;
+            this.button = targets.get(target);
             moved = true;
         }
         else {
             Vector2f closest = new Vector2f(-1, -1);
-            for (Vector2f screenTarget : targets)
+            for (Vector2f screenTarget : targets.keySet())
                 if (screenTarget.x < currentTarget.x)
                     closest = closer(currentTarget, screenTarget, closest);
             if (!closest.equals(new Vector2f(-1, -1))) {
                 this.target = closest;
+                this.button = targets.get(target);
                 moved = true;
             }
         }
@@ -115,7 +124,7 @@ public class GuiButtonTargets {
     public void leftMost(){
         Vector2f currentTarget = getCurrentMouse();
         Vector2f toTheLeft = target;
-        for (Vector2f screenTarget : targets)
+        for (Vector2f screenTarget : targets.keySet())
             if (screenTarget.y == currentTarget.y && screenTarget.x < toTheLeft.x)
                 toTheLeft = screenTarget;
         if (!toTheLeft.equals(target))
@@ -125,7 +134,7 @@ public class GuiButtonTargets {
     public void rightMost(){
         Vector2f currentTarget = getCurrentMouse();
         Vector2f toTheRight = target;
-        for (Vector2f screenTarget : targets)
+        for (Vector2f screenTarget : targets.keySet())
             if (screenTarget.y == currentTarget.y && screenTarget.x > toTheRight.x)
                 toTheRight = screenTarget;
         if (!toTheRight.equals(target))
@@ -134,7 +143,7 @@ public class GuiButtonTargets {
 
     public void upperMost(){
         Vector2f highest = target;
-        for (Vector2f screenTarget : targets)
+        for (Vector2f screenTarget : targets.keySet())
             if (screenTarget.y < highest.y)
                 highest = screenTarget;
         if (!highest.equals(target))
@@ -143,7 +152,7 @@ public class GuiButtonTargets {
 
     public void lowerMost(){
         Vector2f lowest = target;
-        for (Vector2f screenTarget : targets)
+        for (Vector2f screenTarget : targets.keySet())
             if (screenTarget.y > lowest.y)
                 lowest = screenTarget;
         if (!lowest.equals(target))
@@ -173,7 +182,7 @@ public class GuiButtonTargets {
     }
 
     public GuiButtonTargets(){
-        targets = new ArrayList<>();
+        targets = new HashMap<>();
     }
 
     public void setTargetDB(GuiScreen screen) {
@@ -183,7 +192,7 @@ public class GuiButtonTargets {
 
     public void chooseFirst(){
         if(targets.size() > 0)
-            this.target = targets.get(0);
+            this.target = (Vector2f)targets.keySet().toArray()[0]; // TODO: Oof
     }
 
     public void searchTargets() throws IllegalAccessException{
@@ -191,7 +200,7 @@ public class GuiButtonTargets {
             clearTargets();
             for (GuiButton button : ((List<GuiButton>) fieldButtonList.get(targetDB))) {
                 if (button.visible)
-                    targets.add(new Vector2f(button.xPosition + (button.width / 2f), button.yPosition + (button.height / 2f)));
+                    targets.put(new Vector2f(button.xPosition + (button.width / 2f), button.yPosition + (button.height / 2f)), button);
             }
         }
     }
