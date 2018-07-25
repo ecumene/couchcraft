@@ -2,16 +2,19 @@ package xyz.ecumene.couchcraft.utils;
 
 import cpw.mods.fml.client.config.GuiSlider;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.gui.*;
+import net.minecraft.client.gui.inventory.GuiInventory;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
+import xyz.ecumene.couchcraft.api.JumpModeCheck;
+import xyz.ecumene.couchcraft.api.SimpleJumpModeCheck;
 import xyz.ecumene.couchcraft.common.CouchcraftMod;
 import xyz.ecumene.couchcraft.common.binding.AxisBinding;
 import xyz.ecumene.couchcraft.common.binding.ButtonBinding;
 
 import javax.vecmath.Vector2f;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ControllerCursor {
     public static boolean controllerGUIInteractMode = true;
@@ -21,17 +24,29 @@ public class ControllerCursor {
     public GuiButtonTargets targets;
 
     public AxisBinding hoverAxis;
+    public float hoverThreshold = 0.35f;
+    public float axisSensitivity = 3.6f;
     public int targetMouseX, targetMouseY;
+
+    public List<JumpModeCheck> jumpModeList;
 
     public boolean mouseDetatchPossible = true, enableMouseInteraction = true, hoverMode = true;
 
     public ControllerCursor(){
         targets = new GuiButtonTargets();
+
+        jumpModeList = new ArrayList<>();
+        jumpModeList.add((screen, cursor) ->  screen instanceof GuiInventory );
     }
 
     public void tick(ButtonBinding guiLeft, ButtonBinding guiRight, AxisBinding scroll){
         GuiButtonTargets.targetX = targetMouseX;
         GuiButtonTargets.targetY = targetMouseY;
+
+        if(targets.newGuiFlag && hoverMode) {
+            targetMouseX = Minecraft.getMinecraft().currentScreen.width/2;
+            targetMouseY = Minecraft.getMinecraft().currentScreen.height/2;
+        }
 
         if(mouseDetatchPossible && Mouse.getDX()>0.15f | Mouse.getDY()>0.15f | Mouse.getDWheel()>0.1f)
             controllerGUIInteractMode = false;
@@ -40,8 +55,16 @@ public class ControllerCursor {
             if(controllerGUIInteractMode){
                 animationState = 1;
                 Mouse.setGrabbed(true);
+
                 ScaledResolution scaledresolution = new ScaledResolution(Minecraft.getMinecraft(), Minecraft.getMinecraft().displayWidth, Minecraft.getMinecraft().displayHeight);
+
+                if(targetMouseX*scaledresolution.getScaleFactor() > Minecraft.getMinecraft().displayWidth - 16*scaledresolution.getScaleFactor()) targetMouseX = Minecraft.getMinecraft().currentScreen.width - 16;
+                if(targetMouseY*scaledresolution.getScaleFactor() > Minecraft.getMinecraft().displayHeight - 16*scaledresolution.getScaleFactor()) targetMouseY = Minecraft.getMinecraft().currentScreen.height - 16;
+                if(targetMouseX < 0) targetMouseX = 0;
+                if(targetMouseY < 0) targetMouseY = 0;
+
                 Mouse.setCursorPosition(targetMouseX*scaledresolution.getScaleFactor(), Minecraft.getMinecraft().displayHeight-targetMouseY*scaledresolution.getScaleFactor());
+
                 if(guiLeft.justPressed) ControllerGameUtils.mouseClick(0, Minecraft.getMinecraft().currentScreen, targetMouseX, targetMouseY);
                 if(guiRight.justPressed) ControllerGameUtils.mouseClick(1, Minecraft.getMinecraft().currentScreen, targetMouseX, targetMouseY);
                 //TODO: Scroll Wheel Axis
@@ -58,6 +81,11 @@ public class ControllerCursor {
             targets.tick();
 
             if(hoverMode) {
+                if(hoverThreshold < Math.abs(hoverAxis.x))
+                    targetMouseX += hoverAxis.x * axisSensitivity;
+                if(hoverThreshold < Math.abs(hoverAxis.y))
+                    targetMouseY += hoverAxis.y * axisSensitivity;
+            } else {
                 if(targets.button instanceof GuiSlider){
                     Vector2f target = targets.getNextTarget();
                     targetMouseX = (int) target.x;
@@ -72,9 +100,6 @@ public class ControllerCursor {
                     targetMouseX = (int) target.x;
                     targetMouseY = (int) target.y;
                 }
-            } else {
-                targetMouseX = (int) hoverAxis.x;
-                targetMouseY = (int) hoverAxis.y;
             }
         }
 
@@ -82,6 +107,12 @@ public class ControllerCursor {
             if(enableMouseInteraction) Mouse.setGrabbed(false);
 
         lastControllerMode = controllerGUIInteractMode;
+    }
+
+    public boolean shouldEnterJumpMode(GuiScreen screen){
+        for(JumpModeCheck check : jumpModeList)
+            if(check.shouldEnterJumpMode(screen,this)) return true;
+        return false;
     }
 
     public void control(ButtonBinding mouseUp, ButtonBinding mouseDown, ButtonBinding mouseRight, ButtonBinding mouseLeft){
@@ -120,5 +151,8 @@ public class ControllerCursor {
     public void refreshTargets(GuiScreen screen){
         targets.clearTargets();
         targets.setTargetDB(screen);
+
+        hoverMode = !shouldEnterJumpMode(screen);
+        System.out.println(hoverMode);
     }
 }

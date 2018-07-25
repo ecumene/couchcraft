@@ -42,8 +42,6 @@ public class XboxControllerGameInput extends ControllerGameInput {
         this.mouseLeft = new ThresholdXAxisBinding(false, -0.45f, controllerContext.leftThumb);
         this.mouseRight = new ThresholdXAxisBinding(0.45f, controllerContext.leftThumb);
 
-        this.cursor.hoverAxis = controllerContext.leftThumb;
-
         this.sneakBinding = controllerContext.stickDownLeft;
         this.hotbarLeft = controllerContext.bumperLeft;
         this.hotbarRight = controllerContext.bumperRight;
@@ -51,6 +49,7 @@ public class XboxControllerGameInput extends ControllerGameInput {
         attachInputInterceptors();
 
         cursor = new ControllerCursor();
+        this.cursor.hoverAxis = controllerContext.leftThumb;
 
         MinecraftForge.EVENT_BUS.register(this);
         FMLCommonHandler.instance().bus().register(this);
