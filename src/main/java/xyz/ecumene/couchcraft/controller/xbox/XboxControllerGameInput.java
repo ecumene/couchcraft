@@ -5,8 +5,6 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -15,7 +13,7 @@ import xyz.ecumene.couchcraft.common.ControllerContext;
 import xyz.ecumene.couchcraft.common.binding.ButtonBinding;
 import xyz.ecumene.couchcraft.common.binding.axis.ThresholdXAxisBinding;
 import xyz.ecumene.couchcraft.common.binding.axis.ThresholdYAxisBinding;
-import xyz.ecumene.couchcraft.utils.ControllerCursor;
+import xyz.ecumene.couchcraft.common.cursor.ControllerCursor;
 
 public class XboxControllerGameInput extends ControllerGameInput {
     protected ControllerContext controllerContext;

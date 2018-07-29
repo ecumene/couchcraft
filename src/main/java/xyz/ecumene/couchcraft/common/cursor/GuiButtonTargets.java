@@ -1,10 +1,11 @@
-package xyz.ecumene.couchcraft.utils;
+package xyz.ecumene.couchcraft.common.cursor;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import org.lwjgl.input.Mouse;
 import xyz.ecumene.couchcraft.common.ControllerContext;
+import xyz.ecumene.couchcraft.utils.FieldHelper;
 
 import javax.vecmath.Vector2f;
 import java.util.*;

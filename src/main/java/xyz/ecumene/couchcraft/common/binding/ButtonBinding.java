@@ -1,7 +1,6 @@
 package xyz.ecumene.couchcraft.common.binding;
 
-import xyz.ecumene.couchcraft.common.ControllerContext;
-import xyz.ecumene.couchcraft.utils.ControllerCursor;
+import xyz.ecumene.couchcraft.common.cursor.ControllerCursor;
 
 public class ButtonBinding {
     public static boolean universalButtonPressOnThisTick;
