@@ -1,4 +1,4 @@
-package xyz.ecumene.couchcraft.utils;
+package xyz.ecumene.couchcraft.common.cursor;
 
 import cpw.mods.fml.client.config.GuiSlider;
 import net.minecraft.client.Minecraft;
@@ -7,10 +7,10 @@ import net.minecraft.client.gui.inventory.GuiInventory;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import xyz.ecumene.couchcraft.api.JumpModeCheck;
-import xyz.ecumene.couchcraft.api.SimpleJumpModeCheck;
 import xyz.ecumene.couchcraft.common.CouchcraftMod;
 import xyz.ecumene.couchcraft.common.binding.AxisBinding;
 import xyz.ecumene.couchcraft.common.binding.ButtonBinding;
+import xyz.ecumene.couchcraft.utils.ControllerGameUtils;
 
 import javax.vecmath.Vector2f;
 import java.util.ArrayList;

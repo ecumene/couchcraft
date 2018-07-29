@@ -1,23 +1,9 @@
 package xyz.ecumene.couchcraft.common;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ScaledResolution;
-import net.minecraftforge.client.event.GuiOpenEvent;
-import net.minecraftforge.client.event.GuiScreenEvent;
-import net.minecraftforge.common.MinecraftForge;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
 import xyz.ecumene.couchcraft.common.binding.AxisBinding;
 import xyz.ecumene.couchcraft.common.binding.ButtonBinding;
-import xyz.ecumene.couchcraft.utils.ControllerGameUtils;
-import xyz.ecumene.couchcraft.utils.GuiButtonTargets;
-
-import javax.vecmath.Vector2f;
 
 /**
  * Stores controller values to avoid polling multiple times every tick
