@@ -66,6 +66,7 @@ public class ControllerGameUtils {
     public static FieldHelper<GuiScreen, Long> fieldLastMouseEvent = new FieldHelper<>(GuiScreen.class, "field_146288_g", "lastMouseEvent");
     public static Method methodMouseClicked;
     public static Method methodMouseMovedOrUp;
+    public static Method methodMouseClickMove;
 
     public static void mouseClick(int button, GuiScreen screen, int x, int y) {
         try {
@@ -79,11 +80,22 @@ public class ControllerGameUtils {
         }
     }
 
-    public static void mouseMovedOrUp(GuiScreen screen, int x, int y){
+    public static void mouseMovedOrUp(GuiScreen screen, int x, int y, int button){
         try {
             fieldEventButton.set(screen, -1);
             methodMouseMovedOrUp = ReflectionHelper.findMethod(GuiScreen.class, screen, new String[]{"func_146286_b", "mouseMovedOrUp"}, int.class, int.class, int.class);
-            methodMouseMovedOrUp.invoke(screen, x, y, 0);
+            methodMouseMovedOrUp.invoke(screen, x, y, button);
+        } catch(IllegalAccessException|InvocationTargetException e){
+            System.err.println("This error is likely caused by Reflection or LWJGL");
+            e.printStackTrace();
+        }
+    }
+
+    public static void mouseClickMove(GuiScreen screen, int button, int x, int y){
+        try {
+            methodMouseClickMove = ReflectionHelper.findMethod(GuiScreen.class, screen, new String[]{"func_146273_a", "mouseClickMove"}, int.class, int.class, int.class, long.class);
+            long l = Minecraft.getSystemTime() - fieldLastMouseEvent.get(screen);
+            methodMouseClickMove.invoke(screen, x, y, button, l);
         } catch(IllegalAccessException|InvocationTargetException e){
             System.err.println("This error is likely caused by Reflection or LWJGL");
             e.printStackTrace();

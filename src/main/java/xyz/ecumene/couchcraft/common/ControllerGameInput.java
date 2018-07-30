@@ -14,9 +14,7 @@ public class ControllerGameInput extends GameInput {
     public ButtonBinding jumpBinding, sneakBinding;
     public AxisBinding movement, look;
     public ButtonBinding inventoryGUIBinding, exitGUIBinding;
-    public ButtonBinding attack, build;
-
-
+    public ButtonBinding attack, build, drop;
     public ButtonBinding hotbarRight, hotbarLeft;
 
     public float deadzone = 0.25f;
@@ -32,6 +30,7 @@ public class ControllerGameInput extends GameInput {
     public void attachInputInterceptors(){
         if(attack!=null)Minecraft.getMinecraft().gameSettings.keyBindAttack = new MultiKeyBinding(attack, Minecraft.getMinecraft().gameSettings.keyBindAttack);
         if(build!=null)Minecraft.getMinecraft().gameSettings.keyBindUseItem = new MultiKeyBinding(build, Minecraft.getMinecraft().gameSettings.keyBindUseItem);
+        if(drop!=null)Minecraft.getMinecraft().gameSettings.keyBindDrop = new MultiKeyBinding(drop, Minecraft.getMinecraft().gameSettings.keyBindDrop);
         if(sneakBinding !=null)Minecraft.getMinecraft().gameSettings.keyBindSneak = new MultiKeyBinding(sneakBinding, Minecraft.getMinecraft().gameSettings.keyBindSneak);
     }
 
@@ -46,6 +45,7 @@ public class ControllerGameInput extends GameInput {
 
         if(attack!=null)attack.onTick();
         if(build!=null)build.onTick();
+        if(drop!=null)drop.onTick();
         if(sneakBinding !=null) sneakBinding.onTick();
 
         if(exitGUIBinding.pressed)
@@ -56,7 +56,7 @@ public class ControllerGameInput extends GameInput {
     @SideOnly(Side.CLIENT)
     public void updatePlayerMoveState() {
         super.updatePlayerMoveState();
-        if(controllerContext != null) {
+        if(Minecraft.getMinecraft().inGameHasFocus && controllerContext != null) {
             if(inventoryGUIBinding != null){
                 if(inventoryGUIBinding.justPressed) {
                     if(Minecraft.getMinecraft().currentScreen instanceof GuiInventory) {
