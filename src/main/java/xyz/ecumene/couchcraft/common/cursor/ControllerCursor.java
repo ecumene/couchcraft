@@ -21,7 +21,8 @@ public class ControllerCursor {
     private static boolean lastControllerMode = false;
     public int animationState;
 
-    public GuiButtonTargets targets;
+    //TODO: Combine jump target classes (Button and Slot)
+    public GuiSlotTargets targets;
 
     public AxisBinding hoverAxis;
     public float hoverThreshold = 0.35f;
@@ -33,25 +34,27 @@ public class ControllerCursor {
     public boolean mouseDetatchPossible = true, enableMouseInteraction = true, hoverMode = true;
 
     public ControllerCursor(){
-        targets = new GuiButtonTargets();
+        targets = new GuiSlotTargets();
 
         jumpModeList = new ArrayList<>();
-        jumpModeList.add((screen, cursor) ->  screen instanceof GuiInventory );
+        //jumpModeList.add((screen, cursor) ->  screen instanceof GuiInventory );
     }
 
     public void tick(ButtonBinding guiLeft, ButtonBinding guiRight, AxisBinding scroll){
-        GuiButtonTargets.targetX = targetMouseX;
-        GuiButtonTargets.targetY = targetMouseY;
+        GuiSlotTargets.targetX = targetMouseX;
+        GuiSlotTargets.targetY = targetMouseY;
 
-        if(targets.newGuiFlag && hoverMode) {
-            targetMouseX = Minecraft.getMinecraft().currentScreen.width/2;
-            targetMouseY = Minecraft.getMinecraft().currentScreen.height/2;
-        }
+        //Minecraft.getMinecraft().gameSettings.touchscreen = controllerGUIInteractMode;
 
         if(mouseDetatchPossible && Mouse.getDX()>0.15f | Mouse.getDY()>0.15f | Mouse.getDWheel()>0.1f)
             controllerGUIInteractMode = false;
 
         if(Minecraft.getMinecraft().currentScreen != null) {
+            if(targets.newGuiFlag && hoverMode) {
+                targetMouseX = Minecraft.getMinecraft().currentScreen.width/2;
+                targetMouseY = Minecraft.getMinecraft().currentScreen.height/2;
+            }
+
             if(controllerGUIInteractMode){
                 animationState = 1;
                 Mouse.setGrabbed(true);
@@ -70,14 +73,18 @@ public class ControllerCursor {
                 //TODO: Scroll Wheel Axis
 
                 if(guiLeft.pressed | guiRight.pressed) animationState = 2;
-                if(guiLeft.justRelease | guiRight.justRelease) ControllerGameUtils.mouseMovedOrUp(Minecraft.getMinecraft().currentScreen, targetMouseX, targetMouseY);
+
+                if(guiLeft.pressed)
+                    ControllerGameUtils.mouseClickMove(Minecraft.getMinecraft().currentScreen, 0, targetMouseX, targetMouseY);
+                if(guiRight.pressed)
+                    ControllerGameUtils.mouseClickMove(Minecraft.getMinecraft().currentScreen, 1, targetMouseX, targetMouseY);
+
+                if(guiLeft.justRelease) ControllerGameUtils.mouseMovedOrUp(Minecraft.getMinecraft().currentScreen, targetMouseX, targetMouseY, 0);
+                if(guiRight.justRelease) ControllerGameUtils.mouseMovedOrUp(Minecraft.getMinecraft().currentScreen, targetMouseX, targetMouseY, 1);
             } else animationState = -1;
 
-            try {
-                targets.searchTargets();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
+
+                targets.searchSlots();
             targets.tick();
 
             if(hoverMode) {
@@ -85,7 +92,7 @@ public class ControllerCursor {
                     targetMouseX += hoverAxis.x * axisSensitivity;
                 if(hoverThreshold < Math.abs(hoverAxis.y))
                     targetMouseY += hoverAxis.y * axisSensitivity;
-            } else {
+            } /*else {
                 if(targets.button instanceof GuiSlider){
                     Vector2f target = targets.getNextTarget();
                     targetMouseX = (int) target.x;
@@ -95,11 +102,11 @@ public class ControllerCursor {
 
                     GuiSlider slider = (GuiSlider) targets.button;
                     targetMouseX += (slider.sliderValue-0.5f) * slider.width;
-                } else {
-                    Vector2f target = targets.getNextTarget();
-                    targetMouseX = (int) target.x;
-                    targetMouseY = (int) target.y;
-                }
+                }*/ //Haha gone
+            else {
+                Vector2f target = targets.getNextTarget();
+                targetMouseX = (int) target.x;
+                targetMouseY = (int) target.y;
             }
         }
 

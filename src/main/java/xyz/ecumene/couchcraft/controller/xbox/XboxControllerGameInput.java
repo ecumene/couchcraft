@@ -57,7 +57,7 @@ public class XboxControllerGameInput extends ControllerGameInput {
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event){
         cursor.control(mouseUp, mouseDown, mouseRight, mouseLeft);
-        cursor.tick(controllerContext.button1, controllerContext.button2, controllerContext.leftThumb);
+        cursor.tick(controllerContext.button1, controllerContext.button3, controllerContext.leftThumb);
     }
 
     @SideOnly(Side.CLIENT)

@@ -1,5 +1,6 @@
 package xyz.ecumene.couchcraft.common;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.MovementInputFromOptions;
 import scala.actors.threadpool.Arrays;
@@ -24,13 +25,14 @@ public class MovementInputMultiplexer extends MovementInput {
         jump = false;
         sneak = false;
 
-        for(MovementInput input : inputs) {
+        for (MovementInput input : inputs) {
             input.updatePlayerMoveState();
             moveForward += input.moveForward;
             moveStrafe += input.moveStrafe;
 
-            if(input.jump) this.jump = true;
-            if(input.sneak) this.sneak = true;
+            if (input.jump) this.jump = true;
+            if (input.sneak) this.sneak = true;
         }
     }
+
 }
